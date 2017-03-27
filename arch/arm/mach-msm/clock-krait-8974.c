@@ -31,6 +31,15 @@
 #include "clock-krait.h"
 #include "clock.h"
 
+#ifdef CONFIG_SPEED_LEVEL_INTERFACE
+int speed_level = -1;
+module_param(speed_level, int, S_IRUGO);
+#endif
+#ifdef CONFIG_PVS_LEVEL_INTERFACE
+int pvs_level = -1;
+module_param(pvs_level, int, S_IRUGO); 
+#endif
+
 /* Clock inputs coming into Krait subsystem */
 DEFINE_FIXED_DIV_CLK(hfpll_src_clk, 1, NULL);
 DEFINE_FIXED_DIV_CLK(acpu_aux_clk, 2, NULL);
@@ -465,6 +474,10 @@ static void get_krait_bin_format_b(struct platform_device *pdev,
 		*speed = 0;
 	}
 
+#ifdef CONFIG_PVS_LEVEL_INTERFACE
+        speed_level = *speed;
+#endif
+
 	/* Check SVS PVS bin */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "efuse_svs");
 	if (res) {
@@ -500,6 +513,10 @@ static void get_krait_bin_format_b(struct platform_device *pdev,
 		*pvs = 0;
 		*svs_pvs = -1;
 	}
+
+#ifdef CONFIG_PVS_LEVEL_INTERFACE
+	pvs_level = *pvs;
+#endif
 
 	dev_info(&pdev->dev, "PVS version: %d\n", *pvs_ver);
 
